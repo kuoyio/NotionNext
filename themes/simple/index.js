@@ -12,6 +12,7 @@ import { createContext, useContext, useEffect, useRef } from 'react'
 import BlogPostBar from './components/BlogPostBar'
 import CONFIG from './config'
 import { Style } from './style'
+import HomeLanding from './components/HomeLanding'
 
 const AlgoliaSearchModal = dynamic(
   () => import('@/components/AlgoliaSearchModal'),
@@ -134,13 +135,18 @@ const LayoutBase = props => {
 }
 
 /**
- * 博客首页
- * 首页就是列表
+ * 网站首页入口
  * @param {*} props
  * @returns
  */
 const LayoutIndex = props => {
-  return <LayoutPostList {...props} />
+  return (
+    <HomeLanding
+      siteInfo={props.siteInfo}
+      customMenu={props.customMenu}
+      customNav={props.customNav}
+    />
+  )
 }
 /**
  * 博客列表

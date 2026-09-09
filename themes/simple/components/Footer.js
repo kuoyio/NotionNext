@@ -1,5 +1,4 @@
 import AnalyticsBusuanzi from '@/components/AnalyticsBusuanzi'
-import { BeiAnGongAn } from '@/components/BeiAnGongAn'
 import DarkModeButton from '@/components/DarkModeButton'
 import { siteConfig } from '@/lib/config'
 
@@ -9,47 +8,85 @@ import { siteConfig } from '@/lib/config'
  * @returns
  */
 export default function Footer(props) {
+  const { NOTION_CONFIG } = props
   const d = new Date()
   const currentYear = d.getFullYear()
-  const since = siteConfig('SINCE')
-  const ANALYTICS_BUSUANZI_ENABLE = siteConfig('ANALYTICS_BUSUANZI_ENABLE')
-  const copyrightDate =
-    parseInt(since) < currentYear ? since + '-' + currentYear : currentYear
+  const ANALYTICS_BUSUANZI_ENABLE = siteConfig(
+    'ANALYTICS_BUSUANZI_ENABLE',
+    null,
+    NOTION_CONFIG
+  )
+  const beiAn = siteConfig('BEI_AN', null, NOTION_CONFIG)
+  const beiAnLink = siteConfig('BEI_AN_LINK', null, NOTION_CONFIG)
+  const githubUrl =
+    siteConfig('CONTACT_GITHUB', null, NOTION_CONFIG) ||
+    'https://github.com/kuoyio'
+  const rssEnabled = siteConfig('ENABLE_RSS', true, NOTION_CONFIG)
+  const rssUrl =
+    siteConfig('RSS_URL', '/rss/feed.xml', NOTION_CONFIG) || '/rss/feed.xml'
 
   return (
-    <footer className='relative w-full bg-black px-6 border-t'>
-      <DarkModeButton className='text-center pt-4' />
+    <footer className='simple-site-footer relative w-full bg-black px-6 border-t'>
+      <div className='simple-footer-theme-control'>
+        <DarkModeButton className='text-center pt-4' />
+      </div>
 
-      <div className='text-yellow-300 container mx-auto max-w-4xl py-6 md:flex flex-wrap md:flex-no-wrap md:justify-between items-center text-sm'>
-        <div className='text-center'>
-          &copy;{`${copyrightDate}`} {siteConfig('AUTHOR')}. All rights
-          reserved.
-        </div>
-        <div className='md:p-0 text-center md:text-right text-xs'>
-          {/* 右侧链接 */}
-          {/* <a href="#" className="text-black no-underline hover:underline">Privacy Policy</a> */}
-          {siteConfig('BEI_AN') && (
-            <a
-              href={siteConfig('BEI_AN_LINK')}
-              className='no-underline hover:underline ml-4'>
-              {siteConfig('BEI_AN')}
-            </a>
-          )}
-          <BeiAnGongAn />
-          {ANALYTICS_BUSUANZI_ENABLE && (
-            <div className='inline-flex ml-4'>
-              <AnalyticsBusuanzi />
-            </div>
-          )}
-          <span className='no-underline ml-4'>
-            Powered by
+      <div className='simple-footer-content text-yellow-300 container mx-auto max-w-4xl py-6 md:flex flex-wrap md:flex-no-wrap md:justify-between items-center text-sm'>
+        <div className='simple-footer-info-row' aria-label='站点信息'>
+          <span className='simple-footer-copyright'>
+            © {currentYear} kuoyio. All rights reserved.
+          </span>
+          <span className='simple-footer-divider' aria-hidden='true'>
+            |
+          </span>
+          <a
+            href={beiAnLink}
+            className='simple-footer-beian no-underline hover:underline'
+            target='_blank'
+            rel='noreferrer'>
+            {beiAn || '备案号'}
+          </a>
+          <span className='simple-footer-divider' aria-hidden='true'>
+            |
+          </span>
+          <span className='simple-footer-powered'>
+            Powered by{' '}
             <a
               href='https://github.com/notionnext-org/NotionNext'
-              className=' hover:underline'>
-              NotionNext {siteConfig('VERSION')}
+              className='hover:underline'
+              target='_blank'
+              rel='noreferrer'>
+              NotionNext
             </a>
           </span>
         </div>
+
+        <div className='simple-footer-social-row' aria-label='社交链接'>
+          <a
+            href={githubUrl}
+            target='_blank'
+            rel='noreferrer'
+            title='GitHub'
+            aria-label='GitHub'>
+            <i className='fab fa-github' aria-hidden='true' />
+          </a>
+          {rssEnabled !== false && (
+            <a
+              href={rssUrl}
+              target='_blank'
+              rel='noreferrer'
+              title='RSS'
+              aria-label='RSS'>
+              <i className='fas fa-rss' aria-hidden='true' />
+            </a>
+          )}
+        </div>
+
+        {ANALYTICS_BUSUANZI_ENABLE && (
+          <div className='simple-footer-analytics'>
+            <AnalyticsBusuanzi />
+          </div>
+        )}
       </div>
     </footer>
   )

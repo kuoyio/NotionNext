@@ -671,6 +671,290 @@ const Style = () => {
   }
 
 
+  /* Minimal Kuoyio landing page */
+  #theme-simple:has(.simple-home-landing),
+  .dark #theme-simple:has(.simple-home-landing) {
+    min-height: 100svh;
+    color: #111;
+    background: #fff !important;
+  }
+
+  #theme-simple:has(.simple-home-landing) > header,
+  #theme-simple:has(.simple-home-landing) > nav,
+  #theme-simple:has(.simple-home-landing) #right-sidebar,
+  #theme-simple:has(.simple-home-landing) > .fixed {
+    display: none;
+  }
+
+  #theme-simple:has(.simple-home-landing) #container-wrapper {
+    width: 100%;
+    max-width: none;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    align-items: stretch;
+  }
+
+  #theme-simple:has(.simple-home-landing) #container-inner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 0;
+  }
+
+  #theme-simple:has(.simple-home-landing) #container-inner > *:first-child {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  #theme-simple .simple-home-landing {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100svh - 7rem);
+    padding: 4rem 1.5rem 5rem;
+    color: #111;
+    background: #fff;
+  }
+
+  #theme-simple .simple-home-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  #theme-simple .simple-home-identity {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  #theme-simple .simple-home-avatar-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 88px;
+    height: 88px;
+    overflow: hidden;
+    border: 1px solid #d9d9d9;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  #theme-simple .simple-home-avatar {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #theme-simple .simple-home-brand {
+    margin: 0;
+    color: #000;
+    font-family: 'Shrikhand', cursive;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 1;
+  }
+
+  #theme-simple .simple-home-shortcuts {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-top: 0;
+  }
+
+  #theme-simple .simple-home-shortcut {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    color: #111;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+  }
+
+  #theme-simple .simple-home-shortcut:hover,
+  #theme-simple .simple-home-shortcut:focus-visible {
+    color: #1677ff;
+    background: #fff;
+    outline: none;
+    transform: translateY(-2px) scale(1.08);
+  }
+
+  #theme-simple:has(.simple-home-landing) .simple-site-footer {
+    flex-shrink: 0;
+    padding: 0 1.5rem;
+    border-top: 0 !important;
+    border-color: transparent;
+    color: #111;
+    background: #fff !important;
+  }
+
+  #theme-simple:has(.simple-home-landing) .simple-footer-theme-control,
+  #theme-simple:has(.simple-home-landing) .simple-footer-analytics {
+    display: none;
+  }
+
+  #theme-simple:has(.simple-home-landing) .simple-footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: center;
+    max-width: none;
+    padding: 1.1rem 0 1.25rem;
+    color: #111 !important;
+    font-size: 0.75rem;
+    line-height: 1.6;
+  }
+
+  #theme-simple:has(.simple-home-landing) .simple-footer-info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.75rem;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    color: #111 !important;
+    text-align: center;
+  }
+
+  #theme-simple:has(.simple-home-landing) .simple-footer-copyright,
+  #theme-simple:has(.simple-home-landing) .simple-footer-beian,
+  #theme-simple:has(.simple-home-landing) .simple-footer-powered,
+  #theme-simple:has(.simple-home-landing) .simple-footer-info-row a {
+    margin: 0;
+    color: #111 !important;
+  }
+
+  #theme-simple:has(.simple-home-landing) .simple-footer-divider {
+    color: #999;
+  }
+
+  #theme-simple:has(.simple-home-landing) .simple-footer-social-row {
+    display: flex;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
+
+  #theme-simple:has(.simple-home-landing) .simple-footer-social-row a {
+    color: #111;
+    font-size: 1rem;
+    line-height: 1;
+    transition: color 160ms ease, transform 160ms ease;
+  }
+
+  #theme-simple:has(.simple-home-landing) .simple-footer-social-row a:hover,
+  #theme-simple:has(.simple-home-landing) .simple-footer-social-row a:focus-visible {
+    color: #1677ff;
+    outline: none;
+    transform: translateY(-2px) scale(1.08);
+  }
+
+  body:has(#theme-simple .simple-home-landing) #draggableBox {
+    display: none !important;
+  }
+
+  #theme-simple:has(.simple-home-page) #container-wrapper {
+    max-width: 860px;
+    padding-top: 1.5rem;
+  }
+
+  #theme-simple:has(.simple-home-page) #right-sidebar {
+    display: none;
+  }
+
+  #theme-simple:has(.simple-home-page) > header {
+    height: 14rem;
+  }
+
+  #theme-simple:has(.simple-home-page) > header > div {
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+  }
+
+  #theme-simple:has(.simple-home-page) > header img {
+    width: 72px;
+    height: 72px;
+  }
+
+  #theme-simple:has(.simple-home-page) > header .text-2xl {
+    font-size: 1.35rem;
+  }
+
+  #theme-simple:has(.simple-home-page) nav {
+    border-top: 0;
+    box-shadow: none;
+  }
+
+  #theme-simple:has(.simple-home-page) footer {
+    background: #fcfbf8;
+    border-color: var(--home-border);
+    color: var(--home-muted);
+  }
+
+  #theme-simple:has(.simple-home-page) footer .text-yellow-300 {
+    color: var(--home-muted);
+  }
+
+  #theme-simple:has(.simple-home-page) footer a {
+    color: inherit;
+  }
+
+  .dark #theme-simple .simple-home-page {
+    --home-ink: #f2f0eb;
+    --home-muted: #aaa69e;
+    --home-border: #363431;
+    --home-accent: #e27c70;
+    background: #11110f;
+  }
+
+  .dark #theme-simple:has(.simple-home-page) footer {
+    background: #11110f;
+  }
+
+  @media (max-width: 767px) {
+    #theme-simple .simple-home-heading,
+    #theme-simple .simple-post-list,
+    #theme-simple .simple-post-context {
+      padding-right: 1rem;
+      padding-left: 1rem;
+    }
+
+    #theme-simple .simple-home-heading {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    #theme-simple .simple-post-item {
+      display: block;
+      padding: 1.5rem 0;
+    }
+
+    #theme-simple .simple-post-item:first-child {
+      padding-top: 1.25rem;
+    }
+
+    #theme-simple .simple-post-cover-link {
+      width: 100%;
+      height: 10rem;
+      margin-top: 1rem;
+    }
+  }
+
+
   /*  菜单下划线动画 */
   #theme-simple .menu-link {
       text-decoration: none;

@@ -386,7 +386,8 @@ const getSEOMeta = (props, router, locale) => {
   switch (router.route) {
     case '/':
       return {
-        title: `${siteInfo?.title} | ${siteInfo?.description}`,
+        // 首页标签只显示站点名称，描述继续用于 meta description 和分享卡片。
+        title: siteInfo?.title,
         description: `${siteInfo?.description}`,
         image: `${siteInfo?.pageCover}`,
         slug: '',
