@@ -90,7 +90,7 @@ export default function HomeLanding({ siteInfo, customMenu, customNav }) {
   const shortcuts = getShortcuts(customMenu, customNav)
 
   return (
-    <main className='simple-home-landing' aria-labelledby='simple-home-title'>
+    <section className='simple-home-landing' aria-labelledby='simple-home-title'>
       <div className='simple-home-center'>
         <div className='simple-home-identity'>
           <div className='simple-home-avatar-wrap'>
@@ -130,6 +130,6 @@ export default function HomeLanding({ siteInfo, customMenu, customNav }) {
           ))}
         </nav>
       </div>
-    </main>
+    </section>
   )
 }

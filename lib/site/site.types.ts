@@ -13,7 +13,13 @@ export interface SiteInfo {
 }
 
 export type PageStatus = 'Published' | 'Invisible'
-export type PageType = 'Post' | 'Page' | 'Notice' | 'Menu' | 'SubMenu'
+export type PageType =
+  | 'Post'
+  | 'Page'
+  | 'Notice'
+  | 'Menu'
+  | 'SubMenu'
+  | 'Link'
 
 export interface PageDate {
   start_date?: string
@@ -44,6 +50,8 @@ export interface BasePage {
   pageCoverThumbnail?: string
   pageIcon?: string
   href?: string
+  color?: string
+  sortOrder?: number | string
   ext?: Record<string, unknown>
 }
 

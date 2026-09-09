@@ -1,7 +1,7 @@
 import SmartLink from '@/components/SmartLink'
 import { useState } from 'react'
 
-export const MenuItemDrop = ({ link }) => {
+export const MenuItemDrop = ({ link, active = false }) => {
   const [show, changeShow] = useState(false)
   const hasSubMenu = link?.subMenus?.length > 0
 
@@ -17,7 +17,7 @@ export const MenuItemDrop = ({ link }) => {
         <SmartLink
           href={link?.href}
           target={link?.target}
-          className=' menu-link pl-2 pr-4 text-gray-700 dark:text-gray-200 no-underline tracking-widest pb-1'>
+          className={`menu-link pl-2 pr-4 text-gray-700 dark:text-gray-200 no-underline tracking-widest pb-1 ${active ? 'simple-menu-link-active' : ''}`}>
           {link?.icon && (
             <span className='mr-2'>
               <i className={link.icon} />
@@ -29,7 +29,7 @@ export const MenuItemDrop = ({ link }) => {
 
       {hasSubMenu && (
         <>
-          <div className='cursor-pointer  menu-link pl-2 pr-4 text-gray-700 dark:text-gray-200 no-underline tracking-widest pb-1'>
+          <div className={`cursor-pointer menu-link pl-2 pr-4 text-gray-700 dark:text-gray-200 no-underline tracking-widest pb-1 ${active ? 'simple-menu-link-active' : ''}`}>
             {link?.icon && (
               <span className='mr-2'>
                 <i className={link.icon} />

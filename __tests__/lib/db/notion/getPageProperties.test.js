@@ -47,4 +47,17 @@ describe('adjustPageProperties', () => {
     expect(plainPage.slug).toBe('a-book')
     expect(plainPage.href).toBe('/a-book')
   })
+
+  it('keeps Link records as external links', () => {
+    const link = {
+      id: 'link-id',
+      type: 'Link',
+      slug: 'https://example.com'
+    }
+
+    adjustPageProperties(link, { PSEUDO_STATIC: true })
+
+    expect(link.href).toBe('https://example.com')
+    expect(link.target).toBe('_blank')
+  })
 })

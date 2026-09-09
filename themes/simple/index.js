@@ -13,6 +13,8 @@ import BlogPostBar from './components/BlogPostBar'
 import CONFIG from './config'
 import { Style } from './style'
 import HomeLanding from './components/HomeLanding'
+import SimplePageLayout from './components/SimplePageLayout'
+import FriendLinkCard from './components/FriendLinkCard'
 
 const AlgoliaSearchModal = dynamic(
   () => import('@/components/AlgoliaSearchModal'),
@@ -38,8 +40,6 @@ const ArticleAround = dynamic(() => import('./components/ArticleAround'), {
 })
 const ShareBar = dynamic(() => import('@/components/ShareBar'), { ssr: false })
 const TopBar = dynamic(() => import('./components/TopBar'), { ssr: false })
-const Header = dynamic(() => import('./components/Header'), { ssr: false })
-const NavBar = dynamic(() => import('./components/NavBar'), { ssr: false })
 const SideBar = dynamic(() => import('./components/SideBar'), { ssr: false })
 const JumpToTopButton = dynamic(() => import('./components/JumpToTopButton'), {
   ssr: false
@@ -80,46 +80,45 @@ const LayoutBase = props => {
 
         {siteConfig('SIMPLE_TOP_BAR', null, CONFIG) && <TopBar {...props} />}
 
-        {/* 顶部LOGO */}
-        <Header {...props} />
+        <SimplePageLayout
+          customMenu={props.customMenu}
+          customNav={props.customNav}
+          footer={<Footer {...props} />}>
+          {/* 主体 */}
+          <div
+            id='container-wrapper'
+            className={
+              (JSON.parse(siteConfig('LAYOUT_SIDEBAR_REVERSE'))
+                ? 'flex-row-reverse'
+                : '') + ' w-full flex-1 flex items-start max-w-9/10 mx-auto pt-12'
+            }>
+            <div id='container-inner ' className='w-full flex-grow min-h-fit'>
+              <Transition
+                show={!onLoading}
+                appear={true}
+                enter='transition ease-in-out duration-700 transform order-first'
+                enterFrom='opacity-0 translate-y-16'
+                enterTo='opacity-100'
+                leave='transition ease-in-out duration-300 transform'
+                leaveFrom='opacity-100 translate-y-0'
+                leaveTo='opacity-0 -translate-y-16'
+                unmount={false}>
+                {slotTop}
 
-        {/* 导航栏 */}
-        <NavBar {...props} />
-
-        {/* 主体 */}
-        <div
-          id='container-wrapper'
-          className={
-            (JSON.parse(siteConfig('LAYOUT_SIDEBAR_REVERSE'))
-              ? 'flex-row-reverse'
-              : '') + ' w-full flex-1 flex items-start max-w-9/10 mx-auto pt-12'
-          }>
-          <div id='container-inner ' className='w-full flex-grow min-h-fit'>
-            <Transition
-              show={!onLoading}
-              appear={true}
-              enter='transition ease-in-out duration-700 transform order-first'
-              enterFrom='opacity-0 translate-y-16'
-              enterTo='opacity-100'
-              leave='transition ease-in-out duration-300 transform'
-              leaveFrom='opacity-100 translate-y-0'
-              leaveTo='opacity-0 -translate-y-16'
-              unmount={false}>
-              {slotTop}
-
-              {children}
-            </Transition>
-            <AdSlot type='native' />
-          </div>
-
-          {fullWidth ? null : (
-            <div
-              id='right-sidebar'
-              className='hidden xl:block flex-none sticky top-8 w-96 border-l dark:border-gray-800 pl-12 border-gray-100'>
-              <SideBar {...props} />
+                {children}
+              </Transition>
+              <AdSlot type='native' />
             </div>
-          )}
-        </div>
+
+            {fullWidth ? null : (
+              <div
+                id='right-sidebar'
+                className='hidden xl:block flex-none sticky top-8 w-96 border-l dark:border-gray-800 pl-12 border-gray-100'>
+                <SideBar {...props} />
+              </div>
+            )}
+          </div>
+        </SimplePageLayout>
 
         <div className='fixed right-4 bottom-4 z-20'>
           <JumpToTopButton />
@@ -128,7 +127,6 @@ const LayoutBase = props => {
         {/* 搜索框 */}
         <AlgoliaSearchModal cRef={searchModal} {...props} />
 
-        <Footer {...props} />
       </div>
     </ThemeGlobalSimple.Provider>
   )
@@ -167,6 +165,54 @@ const LayoutPostList = props => {
 }
 
 /**
+ * 友情链接页
+ * @param {*} props
+ * @returns
+ */
+const LayoutLinks = props => {
+  const { friendLinks, siteInfo } = props
+  const links = [...(Array.isArray(friendLinks) ? friendLinks : [])].sort((a, b) => {
+    const aOrder = getLinkSortOrder(a?.sortOrder)
+    const bOrder = getLinkSortOrder(b?.sortOrder)
+    const hasAOrder = aOrder !== null
+    const hasBOrder = bOrder !== null
+
+    if (hasAOrder && hasBOrder && aOrder !== bOrder) {
+      return aOrder - bOrder
+    }
+    if (hasAOrder !== hasBOrder) return hasAOrder ? -1 : 1
+    return (b?.publishDate ?? 0) - (a?.publishDate ?? 0)
+  })
+
+  return (
+    <section className='simple-friend-links-page'>
+      {links.length > 0 ? (
+        <div className='simple-friend-link-grid'>
+          {links.map(link => (
+            <FriendLinkCard
+              key={link.id || link.href || link.slug}
+              link={link}
+              fallbackIcon={siteInfo?.icon}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className='simple-friend-links-empty'>暂时还没有友链</p>
+      )}
+    </section>
+  )
+}
+
+const getLinkSortOrder = value => {
+  if (value === undefined || value === null || String(value).trim() === '') {
+    return null
+  }
+
+  const order = Number(value)
+  return Number.isFinite(order) ? order : null
+}
+
+/**
  * 搜索页
  * 也是博客列表
  * @param {*} props
@@ -201,19 +247,34 @@ const LayoutSearch = props => {
  * @returns
  */
 const LayoutArchive = props => {
-  const { archivePosts } = props
+  const { archivePosts = {} } = props
+  const archiveEntries = Object.entries(archivePosts)
+  const postCount = archiveEntries.reduce(
+    (count, [, posts]) => count + posts.length,
+    0
+  )
+
   return (
-    <>
-      <div className='mb-10 pb-20 md:py-12 p-3  min-h-screen w-full'>
-        {Object.keys(archivePosts).map(archiveTitle => (
+    <section className='simple-archive-page' aria-labelledby='simple-archive-title'>
+      <header className='simple-page-heading'>
+        <p className='simple-page-eyebrow'>文章归档</p>
+        <div className='simple-page-heading-row'>
+          <h1 id='simple-archive-title'>全部文章</h1>
+          <span className='simple-page-heading-count'>{postCount} 篇</span>
+        </div>
+        <p className='simple-page-description'>按发布时间浏览全部文章</p>
+      </header>
+
+      <div className='simple-archive-groups'>
+        {archiveEntries.map(([archiveTitle, posts]) => (
           <BlogArchiveItem
             key={archiveTitle}
             archiveTitle={archiveTitle}
-            archivePosts={archivePosts}
+            archivePosts={posts}
           />
         ))}
       </div>
-    </>
+    </section>
   )
 }
 
@@ -373,6 +434,7 @@ export {
   LayoutBase,
   LayoutCategoryIndex,
   LayoutIndex,
+  LayoutLinks,
   LayoutPostList,
   LayoutSearch,
   LayoutSlug,

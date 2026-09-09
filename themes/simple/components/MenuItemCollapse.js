@@ -8,7 +8,7 @@ import { useState } from 'react'
  * @returns
  */
 export const MenuItemCollapse = props => {
-  const { link } = props
+  const { link, active = false } = props
   const [show, changeShow] = useState(false)
   const hasSubMenu = link?.subMenus?.length > 0
 
@@ -35,7 +35,7 @@ export const MenuItemCollapse = props => {
           <SmartLink
             href={link?.href}
             target={link?.target}
-            className='items-center flex justify-between pl-2 pr-4 dark:text-gray-200 no-underline tracking-widest pb-1'>
+            className={`items-center flex justify-between pl-2 pr-4 dark:text-gray-200 no-underline tracking-widest pb-1 ${active ? 'simple-menu-link-active' : ''}`}>
             <span className='text-blue-600 dark:text-blue-300 hover:text-red-400 transition-all items-center duration-200'>
               {link?.icon && (
                 <span className='mr-2'>
@@ -49,7 +49,7 @@ export const MenuItemCollapse = props => {
         {hasSubMenu && (
           <div
             onClick={hasSubMenu ? toggleOpenSubMenu : null}
-            className='items-center flex justify-between pl-2 pr-4 cursor-pointer  dark:text-gray-200 no-underline tracking-widest pb-1'>
+            className={`items-center flex justify-between pl-2 pr-4 cursor-pointer dark:text-gray-200 no-underline tracking-widest pb-1 ${active ? 'simple-menu-link-active' : ''}`}>
             <span className='text-blue-600 dark:text-blue-300 hover:text-red-400 transition-all items-center duration-200'>
               {link?.icon && (
                 <span className='mr-2'>
