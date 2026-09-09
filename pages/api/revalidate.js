@@ -1,5 +1,12 @@
 import BLOG from '@/blog.config'
 import { cleanCache } from '@/lib/cache/local_file_cache'
+import {
+  extractBearerToken,
+  isValidRevalidationPath,
+  MAX_REVALIDATION_PATHS,
+  normalizeRevalidationPath,
+  tokensMatch
+} from '@/lib/revalidation'
 
 /**
  * On-Demand Revalidation API
@@ -34,11 +41,9 @@ export default async function handler(req, res) {
   }
 
   const authHeader = req.headers.authorization || ''
-  const receivedToken = authHeader.startsWith('Bearer ')
-    ? authHeader.slice(7)
-    : req.body?.token || ''
+  const receivedToken = extractBearerToken(authHeader)
 
-  if (receivedToken !== token) {
+  if (!tokensMatch(receivedToken, token)) {
     return res.status(401).json({ ok: false, message: 'Unauthorized' })
   }
 
@@ -63,11 +68,27 @@ export default async function handler(req, res) {
     }
 
     // 批量刷新
-    const targetPaths = paths || (path ? [path] : ['/'])
+    const targetPaths = Array.isArray(paths)
+      ? paths
+      : path
+        ? [path]
+        : ['/']
+
+    if (
+      targetPaths.length === 0 ||
+      targetPaths.length > MAX_REVALIDATION_PATHS ||
+      targetPaths.some(item => !isValidRevalidationPath(item))
+    ) {
+      return res.status(400).json({
+        ok: false,
+        message: `paths must contain 1-${MAX_REVALIDATION_PATHS} site paths`
+      })
+    }
+
     const results = []
 
     for (const p of targetPaths) {
-      const normalizedPath = normalizePath(p)
+      const normalizedPath = normalizeRevalidationPath(p)
       try {
         await res.revalidate(normalizedPath)
         results.push({ path: normalizedPath, revalidated: true })
@@ -89,17 +110,4 @@ export default async function handler(req, res) {
       error: error.message
     })
   }
-}
-
-/**
- * 标准化路径：确保以 / 开头，去掉尾部 /
- */
-function normalizePath(p) {
-  if (!p || typeof p !== 'string') return '/'
-  let normalized = p.trim()
-  if (!normalized.startsWith('/')) normalized = '/' + normalized
-  if (normalized.length > 1 && normalized.endsWith('/')) {
-    normalized = normalized.slice(0, -1)
-  }
-  return normalized
 }
