@@ -9,24 +9,28 @@ export default function ArticleAround({ prev, next }) {
   if (!prev || !next) {
     return <></>
   }
+
   return (
-        <section className='text-gray-800 dark:text-gray-400 h-12 flex items-center justify-between space-x-5 my-4'>
-            {prev && <SmartLink
-                href={`/${prev.slug}`}
-                passHref
-                className='text-sm cursor-pointer justify-start items-center flex hover:underline duration-300'>
+    <nav className='simple-article-around' aria-label='Article navigation'>
+      <SmartLink
+        href={`/${prev.slug}`}
+        className='simple-article-around-link simple-article-around-link-prev'>
+        <span className='simple-article-around-label'>Previous</span>
+        <span className='simple-article-around-title'>
+          <i className='mr-2 fas fa-arrow-left' aria-hidden='true' />
+          {prev.title}
+        </span>
+      </SmartLink>
 
-                <i className='mr-1 fas fa-angle-double-left' />{prev.title}
-
-            </SmartLink>}
-            {next && <SmartLink
-                href={`/${next.slug}`}
-                passHref
-                className='text-sm cursor-pointer justify-end items-center flex hover:underline duration-300'>
-                {next.title}
-                <i className='ml-1 my-1 fas fa-angle-double-right' />
-
-            </SmartLink>}
-        </section>
+      <SmartLink
+        href={`/${next.slug}`}
+        className='simple-article-around-link simple-article-around-link-next'>
+        <span className='simple-article-around-label'>Next</span>
+        <span className='simple-article-around-title'>
+          {next.title}
+          <i className='ml-2 fas fa-arrow-right' aria-hidden='true' />
+        </span>
+      </SmartLink>
+    </nav>
   )
 }

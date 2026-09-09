@@ -1,5 +1,5 @@
 import { useGlobal } from '@/lib/global'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /**
  * 加密文章校验组件
@@ -11,43 +11,59 @@ import { useEffect, useRef } from 'react'
 export default function ArticleLock (props) {
   const { validPassword } = props
   const { locale } = useGlobal()
-
-  const submitPassword = () => {
-    const p = document.getElementById('password')
-    if (!validPassword(p?.value)) {
-      const tips = document.getElementById('tips')
-      if (tips) {
-        tips.innerHTML = ''
-        tips.innerHTML = `<div class='text-red-500 animate__shakeX animate__animated'>${locale.COMMON.PASSWORD_ERROR}</div>`
-      }
-    }
-  }
+  const [hasError, setHasError] = useState(false)
   const passwordInputRef = useRef(null)
+
+  const submitPassword = event => {
+    event?.preventDefault()
+    const isValid = validPassword(passwordInputRef.current?.value || '')
+    setHasError(!isValid)
+  }
+
   useEffect(() => {
     // 选中密码输入框并将其聚焦
-    passwordInputRef.current.focus()
+    passwordInputRef.current?.focus()
   }, [])
 
-  return <div id='container' className='w-full flex justify-center items-center h-96 '>
-        <div className='text-center space-y-3'>
-            <div className='font-bold'>{locale.COMMON.ARTICLE_LOCK_TIPS}</div>
-            <div className='flex mx-4'>
-                <input id="password" type='password'
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        submitPassword()
-                      }
-                    }}
-                    ref={passwordInputRef} // 绑定ref到passwordInputRef变量
-                    className='outline-none flex-1 min-w-0 text-sm pl-5 rounded-l transition focus:shadow-lg font-light leading-10 text-black dark:bg-gray-500 bg-gray-50'
-                ></input>
-                <div onClick={submitPassword} className="flex items-center justify-center whitespace-nowrap cursor-pointer px-4 leading-10 rounded-r duration-300 bg-gray-300 select-none" >
-                    <i className={'duration-200 cursor-pointer fas fa-key dark:text-black'} />
-                    <span className='ml-1'>{locale.COMMON.SUBMIT}</span>
-                </div>
-            </div>
-            <div id='tips'>
-            </div>
+  return (
+    <section className='simple-article-lock' aria-labelledby='article-lock-title'>
+      <div className='simple-article-lock-card'>
+        <div className='simple-article-lock-icon' aria-hidden='true'>
+          <i className='fas fa-lock' />
         </div>
-    </div>
+        <p className='simple-article-lock-eyebrow'>PRIVATE ARTICLE</p>
+        <h1 id='article-lock-title' className='simple-article-lock-title'>
+          {locale.COMMON.ARTICLE_LOCK_TIPS}
+        </h1>
+        <p className='simple-article-lock-description'>
+          Enter the password to continue reading this note.
+        </p>
+
+        <form className='simple-article-lock-form' onSubmit={submitPassword}>
+          <label className='sr-only' htmlFor='password'>
+            {locale.COMMON.ARTICLE_LOCK_TIPS}
+          </label>
+          <input
+            id='password'
+            ref={passwordInputRef}
+            type='password'
+            autoComplete='current-password'
+            aria-invalid={hasError}
+            className='simple-article-lock-input'
+            placeholder='••••••••'
+          />
+          <button type='submit' className='simple-article-lock-submit'>
+            <i className='fas fa-arrow-right' aria-hidden='true' />
+            <span>{locale.COMMON.SUBMIT}</span>
+          </button>
+        </form>
+
+        {hasError && (
+          <p className='simple-article-lock-error' role='alert'>
+            {locale.COMMON.PASSWORD_ERROR}
+          </p>
+        )}
+      </div>
+    </section>
+  )
 }

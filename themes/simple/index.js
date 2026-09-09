@@ -221,41 +221,50 @@ const LayoutSlug = props => {
   const { fullWidth } = useGlobal()
 
   return (
-    <>
+    <div
+      className={`simple-article-page ${
+        fullWidth ? 'simple-article-page-wide' : ''
+      }`}>
       {lock && <ArticleLock validPassword={validPassword} />}
 
       {!lock && post && (
-        <div className={`px-2  ${fullWidth ? '' : 'xl:max-w-4xl 2xl:max-w-6xl'}`}>
-          {/* 文章信息 */}
+        <article
+          className={`simple-article-shell ${
+            fullWidth ? 'simple-article-shell-wide' : ''
+          }`}>
           <ArticleInfo post={post} />
 
-          {/* 广告嵌入 */}
-          {/* <AdSlot type={'in-article'} /> */}
+          <div className='simple-article-lead-line' aria-hidden='true' />
+
           <WWAds orientation='horizontal' className='w-full' />
 
-          <div id='article-wrapper'>
-            {/* Notion文章主体 */}
-            {!lock && <NotionPage post={post} />}
+          <div id='article-wrapper' className='simple-article-content'>
+            <NotionPage post={post} />
           </div>
 
-          {/* 分享 */}
-          <ShareBar post={post} />
+          <section className='simple-article-aftercare'>
+            <div className='simple-article-share'>
+              <span className='simple-article-section-eyebrow'>SHARE THIS NOTE</span>
+              <ShareBar post={post} />
+            </div>
 
-          {/* 广告嵌入 */}
-          <AdSlot type={'in-article'} />
+            <AdSlot type='in-article' />
 
-          {post?.type === 'Post' && (
-            <>
-              <ArticleAround prev={prev} next={next} />
-              <RecommendPosts recommendPosts={recommendPosts} />
-            </>
-          )}
+            {post?.type === 'Post' && (
+              <>
+                <ArticleAround prev={prev} next={next} />
+                <RecommendPosts recommendPosts={recommendPosts} />
+              </>
+            )}
 
-          {/* 评论区 */}
-          <Comment frontMatter={post} />
-        </div>
+            <section className='simple-article-comments'>
+              <span className='simple-article-section-eyebrow'>DISCUSSION</span>
+              <Comment frontMatter={post} />
+            </section>
+          </section>
+        </article>
       )}
-    </>
+    </div>
   )
 }
 
