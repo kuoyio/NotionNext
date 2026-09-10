@@ -15,6 +15,8 @@ import { Style } from './style'
 import HomeLanding from './components/HomeLanding'
 import SimplePageLayout from './components/SimplePageLayout'
 import FriendLinkCard from './components/FriendLinkCard'
+import MovieCard from './components/MovieCard'
+import MoviePagination from './components/MoviePagination'
 
 const AlgoliaSearchModal = dynamic(
   () => import('@/components/AlgoliaSearchModal'),
@@ -210,6 +212,39 @@ const getLinkSortOrder = value => {
 
   const order = Number(value)
   return Number.isFinite(order) ? order : null
+}
+
+/**
+ * 观影记录页
+ * @param {*} props
+ * @returns
+ */
+const LayoutMovie = props => {
+  const { movies, moviePagination, movieBasePath, siteInfo } = props
+  const movieItems = Array.isArray(movies) ? movies : []
+
+  return (
+    <section className='simple-movie-page'>
+      {movieItems.length > 0 ? (
+        <div className='simple-movie-grid'>
+          {movieItems.map((movie, index) => (
+            <MovieCard
+              key={movie.id || movie.slug || movie.title || index}
+              movie={movie}
+              siteInfo={siteInfo}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className='simple-movie-empty'>暂时还没有观影记录</p>
+      )}
+
+      <MoviePagination
+        pagination={moviePagination}
+        basePath={movieBasePath}
+      />
+    </section>
+  )
 }
 
 /**
@@ -435,6 +470,7 @@ export {
   LayoutCategoryIndex,
   LayoutIndex,
   LayoutLinks,
+  LayoutMovie,
   LayoutPostList,
   LayoutSearch,
   LayoutSlug,

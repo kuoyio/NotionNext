@@ -1705,6 +1705,266 @@ const Style = () => {
     }
   }
 
+  /* Movie records */
+  #theme-simple .simple-movie-page {
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  #theme-simple .simple-movie-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  #theme-simple .simple-movie-card {
+    min-width: 0;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.06);
+  }
+
+  #theme-simple .simple-movie-card-header {
+    position: relative;
+    width: 100%;
+    height: 320px;
+    overflow: hidden;
+  }
+
+  #theme-simple .simple-movie-card-poster {
+    position: absolute;
+    z-index: 2;
+    top: 30px;
+    right: 0;
+    left: 0;
+    width: 200px;
+    height: 270px;
+    margin: 0 auto;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    transition: transform 200ms ease-in-out;
+  }
+
+  #theme-simple .simple-movie-card-poster:hover {
+    transform: scale(1.05);
+  }
+
+  #theme-simple .simple-movie-card-poster-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #theme-simple .simple-movie-card-background {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+    background-position: 50%;
+    background-size: cover;
+    box-shadow: inset 0 -40px 30px 40px #fff;
+    filter: blur(6px);
+    transform: scale(1.3);
+  }
+
+  #theme-simple .simple-movie-card-content {
+    position: relative;
+    padding: 16px 32px;
+    overflow: hidden;
+  }
+
+  #theme-simple .simple-movie-card-name {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    min-width: 0;
+    overflow: hidden;
+    color: #666;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    line-height: 1.4;
+  }
+
+  #theme-simple .simple-movie-card-name-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #theme-simple .simple-movie-card-name-remark {
+    flex: 0 1 auto;
+    max-width: 45%;
+    margin-top: 4px;
+    margin-left: 4px;
+    overflow: hidden;
+    color: #999;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #theme-simple .simple-movie-card-divider {
+    position: relative;
+    width: 100px;
+    height: 32px;
+    margin: 0 auto;
+  }
+
+  #theme-simple .simple-movie-card-divider::after {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    height: 1px;
+    background: #b1b1b1;
+    content: '';
+    opacity: 0.5;
+  }
+
+  #theme-simple .simple-movie-card-info {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  #theme-simple .simple-movie-card-info-item {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+    color: #999;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  #theme-simple .simple-movie-card-info-item i {
+    flex: 0 0 1rem;
+    width: 1rem;
+    color: #999;
+    text-align: center;
+  }
+
+  #theme-simple .simple-movie-card-info-item span {
+    min-width: 0;
+    margin-left: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #theme-simple .simple-movie-empty {
+    margin: 0;
+    padding: 2rem 0;
+    border-bottom: 1px solid #ececec;
+    color: #888;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  #theme-simple .simple-movie-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #ececec;
+  }
+
+  #theme-simple .simple-movie-pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  #theme-simple .simple-movie-pagination-control,
+  #theme-simple .simple-movie-pagination-page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.55rem;
+    border: 1px solid #ececec;
+    border-radius: 0.25rem;
+    color: #666;
+    font-size: 0.78rem;
+    line-height: 1;
+    text-decoration: none;
+    transition: border-color 160ms ease, background-color 160ms ease,
+      color 160ms ease;
+  }
+
+  #theme-simple .simple-movie-pagination-control {
+    gap: 0.35rem;
+  }
+
+  #theme-simple .simple-movie-pagination-control:hover,
+  #theme-simple .simple-movie-pagination-page:hover {
+    border-color: #1677ff;
+    color: #1677ff;
+  }
+
+  #theme-simple .simple-movie-pagination-page.is-active {
+    border-color: #1677ff;
+    color: #fff;
+    background: #1677ff;
+  }
+
+  #theme-simple .simple-movie-pagination-page.is-active:hover {
+    color: #fff;
+  }
+
+  #theme-simple .simple-movie-pagination-control.is-disabled {
+    color: #bbb;
+    background: #fafafa;
+    cursor: default;
+  }
+
+  #theme-simple .simple-movie-pagination-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1rem;
+    height: 2rem;
+    color: #999;
+    font-size: 0.8rem;
+  }
+
+  @media (min-width: 576px) {
+    #theme-simple .simple-movie-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 992px) {
+    #theme-simple .simple-movie-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 575px) {
+    #theme-simple .simple-movie-pagination {
+      gap: 0.35rem;
+    }
+
+    #theme-simple .simple-movie-pagination-control {
+      min-width: 1.75rem;
+      padding: 0 0.4rem;
+    }
+
+    #theme-simple .simple-movie-pagination-control span {
+      display: none;
+    }
+  }
+
   #theme-simple .simple-site-footer {
     flex-shrink: 0;
     padding: 0 1.5rem;

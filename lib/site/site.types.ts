@@ -20,6 +20,7 @@ export type PageType =
   | 'Menu'
   | 'SubMenu'
   | 'Link'
+  | 'Movie'
 
 export interface PageDate {
   start_date?: string
@@ -52,6 +53,7 @@ export interface BasePage {
   href?: string
   color?: string
   sortOrder?: number | string
+  score?: string | number
   ext?: Record<string, unknown>
 }
 
