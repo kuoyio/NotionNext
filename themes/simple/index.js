@@ -17,6 +17,10 @@ import SimplePageLayout from './components/SimplePageLayout'
 import FriendLinkCard from './components/FriendLinkCard'
 import MovieCard from './components/MovieCard'
 import MoviePagination from './components/MoviePagination'
+import ArchivePostCard from './components/ArchivePostCard'
+import ArticleLock from './components/ArticleLock'
+import ArticleTableOfContents from './components/ArticleTableOfContents'
+import { formatDateFmt } from '@/lib/utils/formatDate'
 
 const AlgoliaSearchModal = dynamic(
   () => import('@/components/AlgoliaSearchModal'),
@@ -27,20 +31,10 @@ const AlgoliaSearchModal = dynamic(
 const BlogListScroll = dynamic(() => import('./components/BlogListScroll'), {
   ssr: false
 })
-const BlogArchiveItem = dynamic(() => import('./components/BlogArchiveItem'), {
-  ssr: false
-})
-const ArticleLock = dynamic(() => import('./components/ArticleLock'), {
-  ssr: false
-})
 const ArticleInfo = dynamic(() => import('./components/ArticleInfo'), {
   ssr: false
 })
 const Comment = dynamic(() => import('@/components/Comment'), { ssr: false })
-const ArticleAround = dynamic(() => import('./components/ArticleAround'), {
-  ssr: false
-})
-const ShareBar = dynamic(() => import('@/components/ShareBar'), { ssr: false })
 const TopBar = dynamic(() => import('./components/TopBar'), { ssr: false })
 const SideBar = dynamic(() => import('./components/SideBar'), { ssr: false })
 const JumpToTopButton = dynamic(() => import('./components/JumpToTopButton'), {
@@ -77,7 +71,8 @@ const LayoutBase = props => {
     <ThemeGlobalSimple.Provider value={{ searchModal }}>
       <div
         id='theme-simple'
-        className={`${siteConfig('FONT_STYLE')} min-h-screen flex flex-col dark:text-gray-300  bg-white dark:bg-black scroll-smooth`}>
+        className={`${siteConfig('FONT_STYLE')} min-h-screen flex flex-col dark:text-gray-300  bg-white dark:bg-black scroll-smooth`}
+      >
         <Style />
 
         {siteConfig('SIMPLE_TOP_BAR', null, CONFIG) && <TopBar {...props} />}
@@ -85,15 +80,18 @@ const LayoutBase = props => {
         <SimplePageLayout
           customMenu={props.customMenu}
           customNav={props.customNav}
-          footer={<Footer {...props} />}>
+          footer={<Footer {...props} />}
+        >
           {/* 主体 */}
           <div
             id='container-wrapper'
             className={
               (JSON.parse(siteConfig('LAYOUT_SIDEBAR_REVERSE'))
                 ? 'flex-row-reverse'
-                : '') + ' w-full flex-1 flex items-start max-w-9/10 mx-auto pt-12'
-            }>
+                : '') +
+              ' w-full flex-1 flex items-start max-w-9/10 mx-auto pt-12'
+            }
+          >
             <div id='container-inner ' className='w-full flex-grow min-h-fit'>
               <Transition
                 show={!onLoading}
@@ -104,7 +102,8 @@ const LayoutBase = props => {
                 leave='transition ease-in-out duration-300 transform'
                 leaveFrom='opacity-100 translate-y-0'
                 leaveTo='opacity-0 -translate-y-16'
-                unmount={false}>
+                unmount={false}
+              >
                 {slotTop}
 
                 {children}
@@ -115,7 +114,8 @@ const LayoutBase = props => {
             {fullWidth ? null : (
               <div
                 id='right-sidebar'
-                className='hidden xl:block flex-none sticky top-8 w-96 border-l dark:border-gray-800 pl-12 border-gray-100'>
+                className='hidden xl:block flex-none sticky top-8 w-96 border-l dark:border-gray-800 pl-12 border-gray-100'
+              >
                 <SideBar {...props} />
               </div>
             )}
@@ -128,7 +128,6 @@ const LayoutBase = props => {
 
         {/* 搜索框 */}
         <AlgoliaSearchModal cRef={searchModal} {...props} />
-
       </div>
     </ThemeGlobalSimple.Provider>
   )
@@ -173,18 +172,20 @@ const LayoutPostList = props => {
  */
 const LayoutLinks = props => {
   const { friendLinks, siteInfo } = props
-  const links = [...(Array.isArray(friendLinks) ? friendLinks : [])].sort((a, b) => {
-    const aOrder = getLinkSortOrder(a?.sortOrder)
-    const bOrder = getLinkSortOrder(b?.sortOrder)
-    const hasAOrder = aOrder !== null
-    const hasBOrder = bOrder !== null
+  const links = [...(Array.isArray(friendLinks) ? friendLinks : [])].sort(
+    (a, b) => {
+      const aOrder = getLinkSortOrder(a?.sortOrder)
+      const bOrder = getLinkSortOrder(b?.sortOrder)
+      const hasAOrder = aOrder !== null
+      const hasBOrder = bOrder !== null
 
-    if (hasAOrder && hasBOrder && aOrder !== bOrder) {
-      return aOrder - bOrder
+      if (hasAOrder && hasBOrder && aOrder !== bOrder) {
+        return aOrder - bOrder
+      }
+      if (hasAOrder !== hasBOrder) return hasAOrder ? -1 : 1
+      return (b?.publishDate ?? 0) - (a?.publishDate ?? 0)
     }
-    if (hasAOrder !== hasBOrder) return hasAOrder ? -1 : 1
-    return (b?.publishDate ?? 0) - (a?.publishDate ?? 0)
-  })
+  )
 
   return (
     <section className='simple-friend-links-page'>
@@ -239,10 +240,7 @@ const LayoutMovie = props => {
         <p className='simple-movie-empty'>暂时还没有观影记录</p>
       )}
 
-      <MoviePagination
-        pagination={moviePagination}
-        basePath={movieBasePath}
-      />
+      <MoviePagination pagination={moviePagination} basePath={movieBasePath} />
     </section>
   )
 }
@@ -282,33 +280,42 @@ const LayoutSearch = props => {
  * @returns
  */
 const LayoutArchive = props => {
-  const { archivePosts = {} } = props
-  const archiveEntries = Object.entries(archivePosts)
-  const postCount = archiveEntries.reduce(
-    (count, [, posts]) => count + posts.length,
-    0
-  )
+  const { archivePosts, archivePagination, siteInfo } = props
+  const posts = Array.isArray(archivePosts) ? archivePosts : []
+  const monthAnchors = new Set()
 
   return (
-    <section className='simple-archive-page' aria-labelledby='simple-archive-title'>
-      <header className='simple-page-heading'>
-        <p className='simple-page-eyebrow'>文章归档</p>
-        <div className='simple-page-heading-row'>
-          <h1 id='simple-archive-title'>全部文章</h1>
-          <span className='simple-page-heading-count'>{postCount} 篇</span>
-        </div>
-        <p className='simple-page-description'>按发布时间浏览全部文章</p>
-      </header>
+    <section className='simple-archive-page' aria-label='文章归档'>
+      {posts.length > 0 ? (
+        <div className='simple-archive-post-grid'>
+          {posts.map((post, index) => {
+            const month = post?.publishDate
+              ? formatDateFmt(post.publishDate, 'yyyy-MM')
+              : ''
+            const anchorId =
+              month && !monthAnchors.has(month) ? month : undefined
 
-      <div className='simple-archive-groups'>
-        {archiveEntries.map(([archiveTitle, posts]) => (
-          <BlogArchiveItem
-            key={archiveTitle}
-            archiveTitle={archiveTitle}
-            archivePosts={posts}
-          />
-        ))}
-      </div>
+            if (month) monthAnchors.add(month)
+
+            return (
+              <ArchivePostCard
+                key={post.id || post.slug || post.title || index}
+                post={post}
+                siteInfo={siteInfo}
+                anchorId={anchorId}
+              />
+            )
+          })}
+        </div>
+      ) : (
+        <p className='simple-archive-empty'>暂时还没有文章</p>
+      )}
+
+      <MoviePagination
+        pagination={archivePagination}
+        basePath='/archive'
+        ariaLabel='文章归档分页'
+      />
     </section>
   )
 }
@@ -319,51 +326,49 @@ const LayoutArchive = props => {
  * @returns
  */
 const LayoutSlug = props => {
-  const { post, lock, validPassword, prev, next, recommendPosts } = props
+  const { post, lock, hideLock, recommendPosts } = props
   const { fullWidth } = useGlobal()
 
   return (
     <div
       className={`simple-article-page ${
         fullWidth ? 'simple-article-page-wide' : ''
-      }`}>
-      {lock && <ArticleLock validPassword={validPassword} />}
+      }`}
+    >
+      {!hideLock && lock && <ArticleLock validPassword={props.validPassword} />}
 
       {!lock && post && (
         <article
           className={`simple-article-shell ${
             fullWidth ? 'simple-article-shell-wide' : ''
-          }`}>
+          }`}
+        >
           <ArticleInfo post={post} />
 
-          <div className='simple-article-lead-line' aria-hidden='true' />
+          <div className='simple-article-body-layout'>
+            <div className='simple-article-main'>
+              <WWAds orientation='horizontal' className='w-full' />
 
-          <WWAds orientation='horizontal' className='w-full' />
+              <div id='article-wrapper' className='simple-article-content'>
+                <NotionPage post={post} />
+              </div>
 
-          <div id='article-wrapper' className='simple-article-content'>
-            <NotionPage post={post} />
-          </div>
+              <section className='simple-article-aftercare'>
+                <AdSlot type='in-article' />
 
-          <section className='simple-article-aftercare'>
-            <div className='simple-article-share'>
-              <span className='simple-article-section-eyebrow'>SHARE THIS NOTE</span>
-              <ShareBar post={post} />
+                {post?.type === 'Post' && (
+                  <RecommendPosts recommendPosts={recommendPosts} />
+                )}
+
+                <section className='simple-article-comments'>
+                  <span className='simple-article-section-eyebrow'>评论</span>
+                  <Comment frontMatter={post} />
+                </section>
+              </section>
             </div>
 
-            <AdSlot type='in-article' />
-
-            {post?.type === 'Post' && (
-              <>
-                <ArticleAround prev={prev} next={next} />
-                <RecommendPosts recommendPosts={recommendPosts} />
-              </>
-            )}
-
-            <section className='simple-article-comments'>
-              <span className='simple-article-section-eyebrow'>DISCUSSION</span>
-              <Comment frontMatter={post} />
-            </section>
-          </section>
+            <ArticleTableOfContents post={post} />
+          </div>
         </article>
       )}
     </div>
@@ -382,54 +387,21 @@ const Layout404 = props => {
   useEffect(() => {
     // 404
     if (!post) {
-      setTimeout(
-        () => {
-          if (isBrowser) {
-            const article = document.querySelector('#article-wrapper #notion-article')
-            if (!article) {
-              router.push('/404').then(() => {
-                console.warn('找不到页面', router.asPath)
-              })
-            }
+      setTimeout(() => {
+        if (isBrowser) {
+          const article = document.querySelector(
+            '#article-wrapper #notion-article'
+          )
+          if (!article) {
+            router.push('/404').then(() => {
+              console.warn('找不到页面', router.asPath)
+            })
           }
-        },
-        waiting404
-      )
+        }
+      }, waiting404)
     }
   }, [post])
   return <>404 Not found.</>
-}
-
-/**
- * 分类列表
- * @param {*} props
- * @returns
- */
-const LayoutCategoryIndex = props => {
-  const { categoryOptions } = props
-  return (
-    <>
-      <div id='category-list' className='duration-200 flex flex-wrap'>
-        {categoryOptions?.map(category => {
-          return (
-            <SmartLink
-              key={category.name}
-              href={`/category/${category.name}`}
-              passHref
-              legacyBehavior>
-              <div
-                className={
-                  'hover:text-black dark:hover:text-white dark:text-gray-300 dark:hover:bg-gray-600 px-5 cursor-pointer py-2 hover:bg-gray-100'
-                }>
-                <i className='mr-4 fas fa-folder' />
-                {category.name}({category.count})
-              </div>
-            </SmartLink>
-          )
-        })}
-      </div>
-    </>
-  )
 }
 
 /**
@@ -449,7 +421,8 @@ const LayoutTagIndex = props => {
                 key={tag}
                 href={`/tag/${encodeURIComponent(tag.name)}`}
                 passHref
-                className={`cursor-pointer inline-block rounded hover:bg-gray-500 hover:text-white duration-200  mr-2 py-1 px-2 text-xs whitespace-nowrap dark:hover:text-white text-gray-600 hover:shadow-xl dark:border-gray-400 notion-${tag.color}_background dark:bg-gray-800`}>
+                className={`cursor-pointer inline-block rounded hover:bg-gray-500 hover:text-white duration-200  mr-2 py-1 px-2 text-xs whitespace-nowrap dark:hover:text-white text-gray-600 hover:shadow-xl dark:border-gray-400 notion-${tag.color}_background dark:bg-gray-800`}
+              >
                 <div className='font-light dark:text-gray-400'>
                   <i className='mr-1 fas fa-tag' />{' '}
                   {tag.name + (tag.count ? `(${tag.count})` : '')}{' '}
@@ -467,7 +440,6 @@ export {
   Layout404,
   LayoutArchive,
   LayoutBase,
-  LayoutCategoryIndex,
   LayoutIndex,
   LayoutLinks,
   LayoutMovie,

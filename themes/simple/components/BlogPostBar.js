@@ -6,19 +6,12 @@ import { useGlobal } from '@/lib/global'
  * @returns
  */
 export default function BlogPostBar(props) {
-  const { tag, category } = props
+  const { category } = props
   const { locale } = useGlobal()
 
-  if (tag) {
+  if (category) {
     return (
-      <div className='flex items-center text-xl py-2'>
-        <i className='mr-2 fas fa-tag' />
-        {locale.COMMON.TAGS}: {tag}
-      </div>
-    )
-  } else if (category) {
-    return (
-      <div className='flex items-center text-xl py-2'>
+      <div className='simple-post-context'>
         <i className='mr-2 fas fa-th' />
         {locale.COMMON.CATEGORY}: {category}
       </div>

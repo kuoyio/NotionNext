@@ -35,7 +35,7 @@ export default function BlogListPage(props) {
     .replace('.html', '')
 
   return (
-    <div className='w-full md:pr-8 mb-12'>
+    <div className='simple-post-list'>
       <div id='posts-wrapper'>
         {posts?.map((p, index) => (
           <div key={p.id}>
@@ -48,7 +48,7 @@ export default function BlogListPage(props) {
         ))}
       </div>
 
-      <div className='flex justify-between text-xs mt-1'>
+      <div className='simple-post-pagination'>
         <SmartLink
           href={{
             pathname:
@@ -58,7 +58,7 @@ export default function BlogListPage(props) {
             query: router.query.s ? { s: router.query.s } : {}
           }}
           className={`${showPrev ? 'text-blue-600 border-b border-blue-400 visible ' : ' invisible bg-gray pointer-events-none '} no-underline pb-1 px-3`}>
-          NEWER POSTS <i className='fa-solid fa-arrow-left'></i>
+          <i className='fa-solid fa-arrow-left'></i> 上一页
         </SmartLink>
         <SmartLink
           href={{
@@ -66,7 +66,7 @@ export default function BlogListPage(props) {
             query: router.query.s ? { s: router.query.s } : {}
           }}
           className={`${showNext ? 'text-blue-600 border-b border-blue-400 visible' : ' invisible bg-gray pointer-events-none '} no-underline pb-1 px-3`}>
-          OLDER POSTS <i className='fa-solid fa-arrow-right'></i>
+          下一页 <i className='fa-solid fa-arrow-right'></i>
         </SmartLink>
       </div>
     </div>

@@ -1,6 +1,14 @@
 /**
  * 开发人员可能需要关注的配置
  */
+const parseBooleanEnv = value =>
+  ['true', '1', 'yes', 'on'].includes(String(value).trim().toLowerCase())
+
+const useMockData =
+  process.env.USE_MOCK_DATA === undefined
+    ? process.env.NODE_ENV === 'development' && !process.env.NOTION_PAGE_ID
+    : parseBooleanEnv(process.env.USE_MOCK_DATA)
+
 module.exports = {
   SUB_PATH: '', // leave this empty unless you want to deploy in a folder
   DEBUG: process.env.NEXT_PUBLIC_DEBUG || false, // 是否显示调试按钮
@@ -18,6 +26,8 @@ module.exports = {
     process.env.npm_lifecycle_event === 'build' ||
     process.env.npm_lifecycle_event === 'export' ||
     process.env.NODE_ENV === 'development',
+  // 本地可使用 mock 数据启动，避免开发时连接 Notion；线上未设置时保持 Notion 数据源。
+  USE_MOCK_DATA: useMockData,
   isProd: process.env.VERCEL_ENV === 'production' || process.env.EXPORT, // distinguish between development and production environment (ref: https://vercel.com/docs/environment-variables#system-environment-variables)
   BUNDLE_ANALYZER: process.env.ANALYZE === 'true' || false, // 是否展示编译依赖内容与大小
   VERSION: (() => {

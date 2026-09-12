@@ -35,7 +35,11 @@ const getPageItems = (currentPage, totalPages) => {
   ]
 }
 
-export default function MoviePagination({ pagination, basePath = '/movie' }) {
+export default function MoviePagination({
+  pagination,
+  basePath = '/movie',
+  ariaLabel = '观影记录分页'
+}) {
   const currentPage = Number(pagination?.currentPage) || 1
   const totalPages = Number(pagination?.totalPages) || 1
 
@@ -44,7 +48,7 @@ export default function MoviePagination({ pagination, basePath = '/movie' }) {
   const pageItems = getPageItems(currentPage, totalPages)
 
   return (
-    <nav className='simple-movie-pagination' aria-label='观影记录分页'>
+    <nav className='simple-movie-pagination' aria-label={ariaLabel}>
       {currentPage > 1 ? (
         <SmartLink
           href={getPageHref(currentPage - 1, basePath)}

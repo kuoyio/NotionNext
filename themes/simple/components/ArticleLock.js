@@ -3,21 +3,35 @@ import { useEffect, useRef, useState } from 'react'
 
 /**
  * 加密文章校验组件
- * @param {password, validPassword} props
- * @param password 正确的密码
- * @param validPassword(bool) 回调函数，校验正确回调入参为true
+ * @param {validPassword} props
+ * @param validPassword 异步校验密码并加载正文，成功时返回 true
  * @returns
  */
 export default function ArticleLock (props) {
   const { validPassword } = props
   const { locale } = useGlobal()
   const [hasError, setHasError] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const passwordInputRef = useRef(null)
 
   const submitPassword = event => {
+    void handlePasswordSubmit(event)
+  }
+
+  const handlePasswordSubmit = async event => {
     event?.preventDefault()
-    const isValid = validPassword(passwordInputRef.current?.value || '')
-    setHasError(!isValid)
+    if (isSubmitting || typeof validPassword !== 'function') return
+
+    setHasError(false)
+    setIsSubmitting(true)
+    try {
+      const isValid = await validPassword(passwordInputRef.current?.value || '')
+      setHasError(!isValid)
+    } catch {
+      setHasError(true)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   useEffect(() => {
@@ -31,12 +45,12 @@ export default function ArticleLock (props) {
         <div className='simple-article-lock-icon' aria-hidden='true'>
           <i className='fas fa-lock' />
         </div>
-        <p className='simple-article-lock-eyebrow'>PRIVATE ARTICLE</p>
+        <p className='simple-article-lock-eyebrow'>加密文章</p>
         <h1 id='article-lock-title' className='simple-article-lock-title'>
           {locale.COMMON.ARTICLE_LOCK_TIPS}
         </h1>
         <p className='simple-article-lock-description'>
-          Enter the password to continue reading this note.
+          请输入密码后继续阅读。
         </p>
 
         <form className='simple-article-lock-form' onSubmit={submitPassword}>
@@ -50,11 +64,15 @@ export default function ArticleLock (props) {
             autoComplete='current-password'
             aria-invalid={hasError}
             className='simple-article-lock-input'
-            placeholder='••••••••'
+            placeholder='请输入访问密码'
           />
-          <button type='submit' className='simple-article-lock-submit'>
+          <button
+            type='submit'
+            className='simple-article-lock-submit'
+            disabled={isSubmitting}
+            aria-busy={isSubmitting}>
             <i className='fas fa-arrow-right' aria-hidden='true' />
-            <span>{locale.COMMON.SUBMIT}</span>
+            <span>{isSubmitting ? '验证中…' : locale.COMMON.SUBMIT}</span>
           </button>
         </form>
 

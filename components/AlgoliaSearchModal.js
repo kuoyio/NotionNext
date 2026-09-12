@@ -1,9 +1,7 @@
 import replaceSearchResult from '@/components/Mark'
 import { siteConfig } from '@/lib/config'
-import { useGlobal } from '@/lib/global'
 import algoliasearch from 'algoliasearch'
 import throttle from 'lodash/throttle'
-import SmartLink from '@/components/SmartLink'
 import { useRouter } from 'next/router'
 import {
   Fragment,
@@ -274,10 +272,6 @@ export default function AlgoliaSearchModal({ cRef }) {
           ref={inputRef}
         />
 
-        {/* 标签组 */}
-        <div className='mb-4'>
-          <TagGroups />
-        </div>
         {searchResults.length === 0 && keyword && !isLoading && (
           <div>
             <p className=' text-slate-600 text-center my-4 text-base'>
@@ -341,41 +335,6 @@ export default function AlgoliaSearchModal({ cRef }) {
         onClick={closeModal}
         className='z-30 fixed top-0 left-0 w-full h-full flex items-center justify-center glassmorphism'
       />
-    </div>
-  )
-}
-
-/**
- * 标签组
- */
-function TagGroups() {
-  const { tagOptions } = useGlobal()
-  //  获取tagOptions数组前十个
-  const firstTenTags = tagOptions?.slice(0, 10)
-
-  return (
-    <div id='tags-group' className='dark:border-gray-700 space-y-2'>
-      {firstTenTags?.map((tag, index) => {
-        return (
-          <SmartLink
-            passHref
-            key={index}
-            href={`/tag/${encodeURIComponent(tag.name)}`}
-            className={'cursor-pointer inline-block whitespace-nowrap'}>
-            <div
-              className={
-                'flex items-center text-black dark:text-gray-300 hover:bg-blue-600 dark:hover:bg-yellow-600 hover:scale-110 hover:text-white rounded-lg px-2 py-0.5 duration-150 transition-all'
-              }>
-              <div className='text-lg'>{tag.name} </div>
-              {tag.count ? (
-                <sup className='relative ml-1'>{tag.count}</sup>
-              ) : (
-                <></>
-              )}
-            </div>
-          </SmartLink>
-        )
-      })}
     </div>
   )
 }

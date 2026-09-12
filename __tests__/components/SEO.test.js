@@ -65,7 +65,6 @@ describe('SEO structured data', () => {
         description: 'A test article',
         publishTime: '2026-07-01T00:00:00.000Z',
         modifiedTime: '2026-07-02T00:00:00.000Z',
-        tags: ['notion', 'seo'],
         category: 'Engineering'
       },
       siteInfo,
@@ -82,7 +81,6 @@ describe('SEO structured data', () => {
       url: 'https://example.com/article/structured-data',
       datePublished: '2026-07-01T00:00:00.000Z',
       dateModified: '2026-07-02T00:00:00.000Z',
-      keywords: 'notion, seo',
       articleSection: 'Engineering',
       mainEntityOfPage: {
         '@type': 'WebPage',

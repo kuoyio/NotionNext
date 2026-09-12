@@ -7,19 +7,26 @@ import { useGlobal } from '@/lib/global'
 import { getPageTableOfContents } from '@/lib/db/notion/getPageTableOfContents'
 import {
   getPasswordQuery,
-  getPasswordStoragePath,
-  sha256Digest
+  getPasswordStoragePath
 } from '@/lib/utils/password'
 import { checkSlugHasNoSlash } from '@/lib/utils/post'
+import ArticleLock from '@/themes/simple/components/ArticleLock'
 import { DynamicLayout } from '@/themes/theme'
-import md5 from 'js-md5'
 import { useRouter } from 'next/router'
 import PropTypes from 'prop-types'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { getStaticPathsBase } from '@/lib/build/staticPaths'
 import { isExport } from '@/lib/utils/buildMode'
 
 const isStaticExport = process.env.EXPORT === 'true'
+
+const getInitialPost = post => {
+  if (!post?.password) return post
+
+  // 即使上游误带 blockMap，锁定页也不应把正文留在客户端 props 中。
+  const { blockMap, content, toc, ...safePost } = post
+  return safePost
+}
 
 /**
  * 根据notion的slug访问页面
@@ -33,76 +40,131 @@ const Slug = props => {
   const { locale } = useGlobal()
 
   // 文章锁🔐
-  const [lock, setLock] = useState(post?.password && post?.password !== '')
+  const [articlePost, setArticlePost] = useState(() => getInitialPost(post))
+  const [lock, setLock] = useState(() => Boolean(post?.password))
   const { showNotification, Notification } = useNotification()
 
-  /**
-   * 验证文章密码
-   * @param {*} passInput
-   */
-  const validPassword = passInput => {
-    if (!post) {
-      return false
-    }
-    const legacy = md5(String(post?.slug ?? '') + passInput)
-    const nextHash = sha256Digest(passInput)
-    if (nextHash === post?.password || legacy === post?.password) {
-      setLock(false)
-      // 输入密码存入 localStorage；键仅含 pathname，避免 query/hash 导致读写不一致（PR #3389）
-      localStorage.setItem(
-        'password_' + getPasswordStoragePath(router.asPath),
-        passInput
-      )
-      showNotification(locale.COMMON.ARTICLE_UNLOCK_TIPS) // 设置解锁成功提示显示
-      return true
-    }
-    return false
-  }
+  const loadProtectedContent = useCallback(
+    async (
+      targetPost,
+      passInput,
+      { silent = false, isActive = () => true } = {}
+    ) => {
+      if (!targetPost?.id || !targetPost?.password || typeof window === 'undefined') {
+        return false
+      }
+
+      try {
+        const response = await fetch('/api/post-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postId: targetPost.id, password: passInput })
+        })
+
+        if (!response.ok) return false
+
+        const data = await response.json()
+        if (!data?.ok || !data.blockMap) return false
+        if (!isActive()) return false
+
+        setArticlePost(currentPost => ({
+          ...currentPost,
+          blockMap: data.blockMap
+        }))
+        setLock(false)
+
+        // 输入密码存入 localStorage；键仅含 pathname，避免 query/hash 导致读写不一致。
+        window.localStorage.setItem(
+          'password_' + getPasswordStoragePath(router.asPath),
+          passInput
+        )
+
+        if (!silent) {
+          showNotification(locale.COMMON.ARTICLE_UNLOCK_TIPS)
+        }
+        return true
+      } catch (error) {
+        console.warn('[ArticleLock] failed to load protected content:', error)
+        return false
+      }
+    },
+    [locale.COMMON.ARTICLE_UNLOCK_TIPS, router.asPath, showNotification]
+  )
+
+  const validPassword = useCallback(
+    passInput => loadProtectedContent(articlePost, passInput),
+    [articlePost, loadProtectedContent]
+  )
 
   // 文章加载
   useEffect(() => {
-    // 文章加密
-    if (post?.password && post?.password !== '') {
-      setLock(true)
-    } else {
-      setLock(false)
-    }
+    const initialPost = getInitialPost(post)
+    const isLocked = Boolean(post?.password)
+    setArticlePost(initialPost)
+    setLock(isLocked)
+
+    if (!isLocked) return
+
+    let active = true
 
     // 读取上次记录 自动提交密码
-    const passInputs = getPasswordQuery(router.asPath)
-    if (passInputs.length > 0) {
+    const unlockFromStorage = async () => {
+      const passInputs = getPasswordQuery(router.asPath)
       for (const passInput of passInputs) {
-        if (validPassword(passInput)) {
+        if (!active) return
+        if (
+          await loadProtectedContent(initialPost, passInput, {
+            silent: true,
+            isActive: () => active
+          })
+        ) {
           break // 密码验证成功，停止尝试
         }
       }
     }
-    // validPassword 内部依赖 post / router 同时也已在依赖里
+
+    unlockFromStorage()
+    return () => {
+      active = false
+    }
+    // 这里故意只在文章或地址变化时自动尝试已保存密码。
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post, router.asPath])
 
-  // 文章加载
-  useEffect(() => {
-    if (lock) {
-      return
-    }
-    // 文章解锁后生成目录与内容
-    if (post?.blockMap?.block) {
-      post.content = Object.keys(post.blockMap.block).filter(
-        key => post.blockMap.block[key]?.value?.parent_id === post.id
-      )
-      post.toc = getPageTableOfContents(post, post.blockMap)
-    }
-  }, [router, lock, post])
+  const renderPost = useMemo(() => {
+    if (!articlePost?.blockMap?.block) return articlePost
 
-  props = { ...props, lock, validPassword }
+    const content = Object.keys(articlePost.blockMap.block).filter(
+      key => articlePost.blockMap.block[key]?.value?.parent_id === articlePost.id
+    )
+    const postWithContent = { ...articlePost, content }
+
+    return {
+      ...postWithContent,
+      toc: getPageTableOfContents(postWithContent, articlePost.blockMap)
+    }
+  }, [articlePost])
+
   const theme = siteConfig('THEME', BLOG.THEME, props.NOTION_CONFIG)
+  const layoutProps = {
+    ...props,
+    post: renderPost,
+    lock,
+    validPassword,
+    // simple 主题的动态布局加载期间，由页面本身负责渲染锁定面板，避免首屏出现空白。
+    hideLock: theme === 'simple'
+  }
   return (
     <>
+      {layoutProps.hideLock && lock && (
+        <div className='simple-article-page'>
+          <ArticleLock validPassword={validPassword} />
+        </div>
+      )}
       {/* 文章布局 */}
-      <DynamicLayout theme={theme} layoutName='LayoutSlug' {...props} />
+      <DynamicLayout theme={theme} layoutName='LayoutSlug' {...layoutProps} />
       {/* 解锁密码提示框 */}
-      {post?.password && post?.password !== '' && !lock && <Notification />}
+      {renderPost?.password && !lock && <Notification />}
       {/* 导流工具 */}
       <TechGrow lock={lock} />
     </>

@@ -3,8 +3,6 @@ import SmartLink from '@/components/SmartLink'
 
 const DEFAULT_SHORTCUTS = [
   { href: '/archive', label: '文章归档', icon: 'fa-solid fa-box-archive' },
-  { href: '/category', label: '文章分类', icon: 'fa-solid fa-folder' },
-  { href: '/tag', label: '文章标签', icon: 'fa-solid fa-tags' },
   { href: '/search', label: '搜索文章', icon: 'fa-solid fa-magnifying-glass' }
 ]
 
@@ -19,6 +17,11 @@ function collectNavigableItems(items, result = []) {
     }
 
     const href = typeof item.href === 'string' ? item.href.trim() : ''
+    const path = href.split(/[?#]/)[0].replace(/\/+$/, '') || '/'
+    // 分类页已移除，首页快捷入口不展示失效的分类链接。
+    if (path === '/category' || path.startsWith('/category/')) {
+      return
+    }
     // 带子菜单的一级 Menu 会用 `#` 作为占位链接，首页快捷入口不应展示它。
     const isPlaceholderHref = /^\/+#$/.test(href) || href === '#'
     if (href && !isPlaceholderHref) {
@@ -35,7 +38,9 @@ function collectNavigableItems(items, result = []) {
 
 function isChineseOnlyItem(item) {
   const href = String(item?.href || '').toLowerCase()
-  const name = String(item?.name || item?.title || '').trim().toLowerCase()
+  const name = String(item?.name || item?.title || '')
+    .trim()
+    .toLowerCase()
   return href !== '/en' && !href.startsWith('/en/') && name !== 'english'
 }
 
@@ -52,7 +57,10 @@ function resolveIcon(icon, index) {
   }
 
   // Notion 菜单通常填写 Font Awesome class，例如 `fas fa-folder`。
-  if (value.includes('fa-') || /\b(?:fa|fas|far|fab|fal|fad|fat)\b/.test(value)) {
+  if (
+    value.includes('fa-') ||
+    /\b(?:fa|fas|far|fab|fal|fad|fat)\b/.test(value)
+  ) {
     return { className: value }
   }
 
@@ -90,7 +98,10 @@ export default function HomeLanding({ siteInfo, customMenu, customNav }) {
   const shortcuts = getShortcuts(customMenu, customNav)
 
   return (
-    <section className='simple-home-landing' aria-labelledby='simple-home-title'>
+    <section
+      className='simple-home-landing'
+      aria-labelledby='simple-home-title'
+    >
       <div className='simple-home-center'>
         <div className='simple-home-identity'>
           <div className='simple-home-avatar-wrap'>
@@ -117,7 +128,8 @@ export default function HomeLanding({ siteInfo, customMenu, customNav }) {
               target={shortcut.target}
               className='simple-home-shortcut'
               aria-label={shortcut.label}
-              title={shortcut.label}>
+              title={shortcut.label}
+            >
               {shortcut.text ? (
                 <span aria-hidden='true'>{shortcut.text}</span>
               ) : (

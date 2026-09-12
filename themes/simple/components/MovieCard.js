@@ -34,10 +34,6 @@ const getDateText = value => {
 }
 
 const getCategoryText = movie => {
-  if (Array.isArray(movie?.tags) && movie.tags.length > 0) {
-    return movie.tags.map(getText).filter(Boolean).join(' / ')
-  }
-
   if (Array.isArray(movie?.category)) {
     return movie.category.map(getText).filter(Boolean).join(' / ')
   }
@@ -86,7 +82,7 @@ export default function MovieCard({ movie, siteInfo }) {
 
         <div className='simple-movie-card-info'>
           <div className='simple-movie-card-info-item'>
-            <i className='fas fa-tags' aria-hidden='true' />
+            <i className='fas fa-folder' aria-hidden='true' />
             <span title={category}>{category}</span>
           </div>
           <div className='simple-movie-card-info-item'>
