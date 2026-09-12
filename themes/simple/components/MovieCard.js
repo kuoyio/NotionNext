@@ -34,11 +34,17 @@ const getDateText = value => {
 }
 
 const getCategoryText = movie => {
-  if (Array.isArray(movie?.category)) {
-    return movie.category.map(getText).filter(Boolean).join(' / ')
+  const tags = Array.isArray(movie?.tags)
+    ? movie.tags
+    : Array.isArray(movie?.tagItems)
+      ? movie.tagItems.map(tag => tag?.name)
+      : []
+
+  if (tags.length > 0) {
+    return tags.map(getText).filter(Boolean).join(' / ')
   }
 
-  return getText(movie?.category)
+  return ''
 }
 
 export default function MovieCard({ movie, siteInfo }) {
