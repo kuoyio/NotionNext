@@ -388,15 +388,6 @@ const Style = () => {
         font-size: 0.75rem;
       }
 
-      #theme-simple .simple-article-comments {
-        padding-top: 0.5rem;
-        border-top: 1px solid var(--article-border);
-      }
-
-      #theme-simple .simple-article-comments > .comment {
-        margin-top: 1rem;
-      }
-
       #theme-simple .simple-article-lock {
         display: flex;
         align-items: center;
@@ -853,11 +844,6 @@ const Style = () => {
       #theme-simple .simple-article-related-link {
         padding: 0.75rem 0;
         color: var(--article-ink);
-      }
-
-      #theme-simple .simple-article-comments {
-        padding-top: 1.25rem;
-        border-top: 1px solid var(--article-border);
       }
 
       #theme-simple .simple-article-lock {

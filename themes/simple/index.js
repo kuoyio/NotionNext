@@ -34,7 +34,6 @@ const BlogListScroll = dynamic(() => import('./components/BlogListScroll'), {
 const ArticleInfo = dynamic(() => import('./components/ArticleInfo'), {
   ssr: false
 })
-const Comment = dynamic(() => import('@/components/Comment'), { ssr: false })
 const TopBar = dynamic(() => import('./components/TopBar'), { ssr: false })
 const SideBar = dynamic(() => import('./components/SideBar'), { ssr: false })
 const JumpToTopButton = dynamic(() => import('./components/JumpToTopButton'), {
@@ -359,11 +358,6 @@ const LayoutSlug = props => {
                 {post?.type === 'Post' && (
                   <RecommendPosts recommendPosts={recommendPosts} />
                 )}
-
-                <section className='simple-article-comments'>
-                  <span className='simple-article-section-eyebrow'>评论</span>
-                  <Comment frontMatter={post} />
-                </section>
               </section>
             </div>
 

@@ -1,6 +1,5 @@
 import LazyImage from '@/components/LazyImage'
 import NotionPage from '@/components/NotionPage'
-import TwikooCommentCount from '@/components/TwikooCommentCount'
 import { siteConfig } from '@/lib/config'
 import { useGlobal } from '@/lib/global'
 import { formatDateFmt } from '@/lib/utils/formatDate'
@@ -33,7 +32,6 @@ export const BlogItem = props => {
               <span>{publishedAt}</span>
             ))}
           {post.password && <span className='simple-post-private'>已加密</span>}
-          <TwikooCommentCount post={post} className='simple-post-comments' />
         </div>
 
         <h2 className='simple-post-title'>
