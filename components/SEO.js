@@ -13,7 +13,7 @@ import { useEffect } from 'react'
  * @returns
  */
 const SEO = props => {
-  const { children, siteInfo, post, NOTION_CONFIG } = props
+  const { children, siteInfo, NOTION_CONFIG } = props
   const PATH = siteConfig('PATH')
   const LINK = normalizeSiteUrl(
     siteConfig('LINK', siteInfo?.link, NOTION_CONFIG)
@@ -56,10 +56,7 @@ const SEO = props => {
 
   // SEO关键词
   const KEYWORDS = siteConfig('KEYWORDS')
-  let keywords = meta?.tags || KEYWORDS
-  if (post?.tags && post?.tags?.length > 0) {
-    keywords = post?.tags?.join(',')
-  }
+  const keywords = KEYWORDS
   if (meta) {
     url = createSiteUrl(url, meta.slug) || url
     image = getAbsoluteImageUrl(meta.image || '/bg_image.jpg', LINK)
@@ -232,7 +229,6 @@ const SEO = props => {
           )}
           <meta property='article:author' content={AUTHOR} />
           <meta property='article:section' content={category} />
-          <meta property='article:tag' content={keywords} />
           {FACEBOOK_PAGE && (
             <meta property='article:publisher' content={FACEBOOK_PAGE} />
           )}
@@ -332,7 +328,6 @@ export const generateStructuredData = (
         '@type': 'WebPage',
         '@id': url
       },
-      keywords: meta.tags?.join(', '),
       articleSection: meta.category
     }
   }
@@ -386,7 +381,8 @@ const getSEOMeta = (props, router, locale) => {
   switch (router.route) {
     case '/':
       return {
-        title: `${siteInfo?.title} | ${siteInfo?.description}`,
+        // 首页标签只显示站点名称，描述继续用于 meta description 和分享卡片。
+        title: siteInfo?.title,
         description: `${siteInfo?.description}`,
         image: `${siteInfo?.pageCover}`,
         slug: '',
@@ -484,7 +480,6 @@ const getSEOMeta = (props, router, locale) => {
         slug: post?.slug,
         image: post?.pageCoverThumbnail || `${siteInfo?.pageCover}`,
         category,
-        tags: post?.tags,
         publishDay: post?.publishDay,
         lastEditedDay: post?.lastEditedDay,
         publishTime:

@@ -23,6 +23,10 @@ module.exports = {
       process.env.NEXT_PUBLIC_NOTION_PROPERTY_TYPE_MEMBER || 'Member', // 社区成员资料
     type_event:
       process.env.NEXT_PUBLIC_NOTION_PROPERTY_TYPE_EVENT || 'Event', // 社区活动
+    type_link:
+      process.env.NEXT_PUBLIC_NOTION_PROPERTY_TYPE_LINK || 'Link', // 友情链接
+    type_movie:
+      process.env.NEXT_PUBLIC_NOTION_PROPERTY_TYPE_MOVIE || 'Movie', // 观影记录
     title: process.env.NEXT_PUBLIC_NOTION_PROPERTY_TITLE || 'title', // 文章标题
     status: process.env.NEXT_PUBLIC_NOTION_PROPERTY_STATUS || 'status',
     status_publish:

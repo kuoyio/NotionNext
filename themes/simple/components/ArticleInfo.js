@@ -1,58 +1,79 @@
 import SmartLink from '@/components/SmartLink'
 import { useGlobal } from '@/lib/global'
-import CONFIG from '../config'
-import { siteConfig } from '@/lib/config'
 import { formatDateFmt } from '@/lib/utils/formatDate'
-import NotionIcon from '@/components/NotionIcon'
 
 /**
- * 文章描述
+ * 文章详情页头部
+ *
+ * 将文章的核心信息集中在一个轻量的标题区中，
+ * 正文仍然完全由 NotionPage 渲染。
  * @param {*} props
  * @returns
  */
-export default function ArticleInfo (props) {
+export default function ArticleInfo(props) {
   const { post } = props
-
   const { locale } = useGlobal()
+  const common = locale?.COMMON || {}
+  const isPost = post?.type === 'Post'
+  const archiveHref = post?.publishDate
+    ? `/archive#${formatDateFmt(post.publishDate, 'yyyy-MM')}`
+    : '/archive'
 
   return (
-        <section className="mt-2 text-gray-600 dark:text-gray-400 leading-8">
-            <h2
-                className="blog-item-title mb-5 font-bold text-black text-xl md:text-2xl no-underline">
-                {siteConfig('POST_TITLE_ICON') && <NotionIcon icon={post?.pageIcon} />}{post?.title}
-            </h2>
+    <header className='simple-article-hero'>
+      <div className='simple-article-kicker'>
+        <span className='simple-article-kicker-mark' aria-hidden='true' />
+        <span>{isPost ? '文章' : '页面'}</span>
+        {post?.category && (
+          <>
+            <span className='simple-article-kicker-divider' aria-hidden='true'>
+              ·
+            </span>
+            <span className='simple-article-kicker-link'>{post.category}</span>
+          </>
+        )}
+        {post?.publishDay && (
+          <>
+            <span className='simple-article-kicker-divider' aria-hidden='true'>
+              ·
+            </span>
+            <SmartLink
+              href={archiveHref}
+              className='simple-article-kicker-link'
+            >
+              {post.publishDay}
+            </SmartLink>
+          </>
+        )}
+      </div>
+      <h1 className='simple-article-title'>{post?.title}</h1>
 
-            <div className='flex flex-wrap text-gray-700 dark:text-gray-300'>
-                {post?.type !== 'Page' && (
-                    <div className="space-x-3 mr-4">
-                        <span> <i className="fa-regular fa-user"></i> <a href={siteConfig('SIMPLE_AUTHOR_LINK', null, CONFIG)}>{siteConfig('AUTHOR')}</a></span>
-                        <span> <i className="fa-regular fa-clock"></i> {post?.publishDay}</span>
-                        {post?.category && <span>  <i className="fa-regular fa-folder"></i> <a href={`/category/${post?.category}`} className="hover:text-red-400 transition-all duration-200">{post?.category}</a></span>}
-                        {post?.tags && post?.tags?.length > 0 && post?.tags.map(t => <span key={t}> / <SmartLink href={`/tag/${t}`}><span className=' hover:text-red-400 transition-all duration-200'>{t}</span></SmartLink></span>)}
-                    </div>)}
+      <div className='simple-article-meta' aria-label='文章信息'>
+        {post?.lastEditedDay && (
+          <span className='simple-article-meta-item'>
+            <span>
+              {common.LAST_EDITED_TIME || 'Updated'} {post.lastEditedDay}
+            </span>
+          </span>
+        )}
 
-                {post?.type !== 'Page' && (<div className=''>
-                    <span>{locale.COMMON.POST_TIME}:
-                        <SmartLink
-                            href={`/archive#${formatDateFmt(post?.publishDate, 'yyyy-MM')}`}
-                            passHref
-                            className="pl-1 mr-2 cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 border-b dark:border-gray-500 border-dashed">
-                            {post?.publishDay}
-                        </SmartLink>
-                    </span>
-                    <span className='mr-2'>|</span>
-                    <span className='mx-2  dark:text-gray-500'>
-                        {locale.COMMON.LAST_EDITED_TIME}: {post?.lastEditedDay}
-                    </span>
-                    <span className='mr-2'>|</span>
-                    <span className="hidden busuanzi_container_page_pv font-light mr-2">
-                        <i className='mr-1 fas fa-eye' />
-                        &nbsp;
-                        <span className="mr-2 busuanzi_value_page_pv" />
-                    </span>
-                </div>)}
+        {post?.readTime > 0 && (
+          <span className='simple-article-meta-item'>
+            <span>
+              {common.READ_TIME || 'Read time'} {post.readTime}{' '}
+              {common.MINUTE || 'min'}
+            </span>
+          </span>
+        )}
 
-            </div>
-        </section>
+        {post?.wordCount > 0 && (
+          <span className='simple-article-meta-item'>
+            <span>
+              {post.wordCount} {common.WORD_COUNT || 'words'}
+            </span>
+          </span>
+        )}
+      </div>
+    </header>
   )
 }

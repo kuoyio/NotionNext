@@ -12,25 +12,8 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 // 扫描项目 /themes下的目录名
 const themes = scanSubdirectories(path.resolve(__dirname, 'themes'))
-// 检测用户开启的多语言
-const locales = (function () {
-  // 根据BLOG_NOTION_PAGE_ID 检查支持多少种语言数据.
-  // 支持如下格式配置多个语言的页面id xxx,zh:xxx,en:xxx
-  const langs = [BLOG.LANG]
-  if (BLOG.NOTION_PAGE_ID.indexOf(',') > 0) {
-    const siteIds = BLOG.NOTION_PAGE_ID.split(',')
-    for (const siteId of siteIds) {
-      const prefix = extractLangPrefix(siteId)
-      // 如果包含前缀 例如 zh , en 等
-      if (prefix) {
-        if (!langs.includes(prefix)) {
-          langs.push(prefix)
-        }
-      }
-    }
-  }
-  return langs
-})()
+// 当前站点只维护一个中文入口；英文数据如仍保留在 Notion 中，也不会注册为站点语言。
+const locales = [BLOG.LANG]
 
 // next dev 时配置可能被多个 worker 各自加载一次，globalThis 无法跨进程去重；用独占文件锁只打印一行。
 ;(function printDevCacheHint() {
@@ -60,7 +43,9 @@ const locales = (function () {
     return
   }
   console.log(
-    '[NotionNext] Dev cache ON (ENABLE_CACHE=true); live Notion data → ENABLE_CACHE=false in .env.local'
+    BLOG.USE_MOCK_DATA
+      ? '[NotionNext] Dev mock data ON; Notion API is disabled'
+      : '[NotionNext] Dev cache ON (ENABLE_CACHE=true); live Notion data → ENABLE_CACHE=false in .env.local'
   )
 })()
 
@@ -220,6 +205,7 @@ const nextConfig = {
     ? undefined
     : {
       defaultLocale: BLOG.LANG,
+      localeDetection: false,
       // 支持的所有多语言,按需填写即可
       locales: locales
     },

@@ -71,8 +71,6 @@ const ShareButtons = ({ post }) => {
   const [shareUrl, setShareUrl] = useState(siteConfig('LINK') + router.asPath)
   const title = post?.title || siteConfig('TITLE')
   const image = post?.pageCover
-  const tags = post.tags || []
-  const hashTags = tags.map(tag => `#${tag}`).join(',')
   const body =
     post?.title + ' | ' + title + ' ' + shareUrl + ' ' + post?.summary
 
@@ -111,12 +109,11 @@ const ShareButtons = ({ post }) => {
     const encodedTitle = encodeURIComponent(titleWithSiteInfo)
     const encodedBody = encodeURIComponent(body)
     const encodedImage = encodeURIComponent(image || '')
-    const encodedHashTags = encodeURIComponent(hashTags)
     const appId = siteConfig('FACEBOOK_APP_ID') || ''
 
     switch (service) {
       case 'facebook':
-        return `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&hashtag=${encodedHashTags}`
+        return `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`
       case 'messenger':
         return `https://www.facebook.com/dialog/send?app_id=${appId}&link=${encodedUrl}&redirect_uri=${encodedUrl}`
       case 'line':
@@ -126,7 +123,7 @@ const ShareButtons = ({ post }) => {
       case 'email':
         return `mailto:?subject=${encodedTitle}&body=${encodedBody}`
       case 'twitter':
-        return `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}&hashtags=${encodeURIComponent(tags.join(','))}`
+        return `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`
       case 'telegram':
         return `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`
       case 'whatsapp':
@@ -140,7 +137,7 @@ const ShareButtons = ({ post }) => {
       case 'okshare':
         return `https://connect.ok.ru/offer?url=${encodedUrl}&title=${encodedTitle}`
       case 'tumblr':
-        return `https://www.tumblr.com/widgets/share/tool?canonicalUrl=${encodedUrl}&title=${encodedTitle}&tags=${encodeURIComponent(tags.join(','))}`
+        return `https://www.tumblr.com/widgets/share/tool?canonicalUrl=${encodedUrl}&title=${encodedTitle}`
       case 'livejournal':
         return `https://www.livejournal.com/update.bml?subject=${encodedTitle}&event=${encodedBody}`
       case 'mailru':

@@ -1,8 +1,7 @@
 import BLOG from '@/blog.config'
 import { siteConfig } from '@/lib/config'
-import { fetchGlobalAllData } from '@/lib/db/SiteDataApi'
+import { getArchivePageProps } from '@/lib/site/archivePage'
 import { isBrowser } from '@/lib/utils'
-import { formatDateFmt } from '@/lib/utils/formatDate'
 import { DynamicLayout } from '@/themes/theme'
 import { useEffect } from 'react'
 
@@ -31,43 +30,11 @@ const ArchiveIndex = props => {
 }
 
 export async function getStaticProps({ locale }) {
-  const props = await fetchGlobalAllData({ from: 'archive-index', locale })
-  // 处理分页
-  props.posts = props.allPages?.filter(
-    page => page.type === 'Post' && page.status === 'Published'
-  )
-  delete props.allPages
-
-  const postsSortByDate = Object.create(props.posts)
-
-  postsSortByDate.sort((a, b) => {
-    return b?.publishDate - a?.publishDate
+  return getArchivePageProps({
+    page: 1,
+    locale,
+    from: 'archive-index'
   })
-
-  const archivePosts = {}
-
-  postsSortByDate.forEach(post => {
-    const date = formatDateFmt(post.publishDate, 'yyyy-MM')
-    if (archivePosts[date]) {
-      archivePosts[date].push(post)
-    } else {
-      archivePosts[date] = [post]
-    }
-  })
-
-  props.archivePosts = archivePosts
-  delete props.allPages
-
-  return {
-    props,
-    revalidate: process.env.EXPORT
-      ? undefined
-      : siteConfig(
-          'NEXT_REVALIDATE_SECOND',
-          BLOG.NEXT_REVALIDATE_SECOND,
-          props.NOTION_CONFIG
-        )
-  }
 }
 
 export default ArchiveIndex

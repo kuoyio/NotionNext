@@ -7,31 +7,39 @@ import SmartLink from '@/components/SmartLink'
  */
 export default function BlogArchiveItem({ archiveTitle, archivePosts }) {
   return (
-    <div key={archiveTitle}>
-      <div id={archiveTitle} className='pt-16 pb-4 text-3xl dark:text-gray-300'>
+    <section className='simple-archive-group' id={archiveTitle}>
+      <h2 className='simple-archive-group-title'>
         {archiveTitle}
-      </div>
+      </h2>
 
-      <ul>
-        {archivePosts[archiveTitle].map(post => {
+      <ul className='simple-archive-items'>
+        {archivePosts.map(post => {
           return (
-            <li
-              key={post.id}
-              className='border-l-2 p-1 text-xs md:text-base items-center  hover:scale-x-105 hover:border-gray-500 dark:hover:border-gray-300 dark:border-gray-400 transform duration-500'>
-              <div id={post?.publishDay}>
-                <span className='text-gray-400'>{post.date?.start_date}</span>{' '}
-                &nbsp;
+            <li key={post.id} className='simple-archive-item'>
+              <time
+                className='simple-archive-date'
+                dateTime={post.date?.start_date || ''}>
+                {post.date?.start_date}
+              </time>
+              <div className='simple-archive-post'>
                 <SmartLink
                   href={post?.href}
                   passHref
-                  className='dark:text-gray-400  dark:hover:text-gray-300 overflow-x-hidden hover:underline cursor-pointer text-gray-600'>
+                  className='simple-archive-link'>
                   {post.title}
                 </SmartLink>
+                {post.password && (
+                  <i
+                    className='simple-archive-lock fa-solid fa-lock'
+                    title='加密文章'
+                    aria-label='加密文章'
+                  />
+                )}
               </div>
             </li>
           )
         })}
       </ul>
-    </div>
+    </section>
   )
 }

@@ -116,13 +116,11 @@ async function filterByMemCache(allPosts, keyword) {
   for (const post of allPosts) {
     const cacheKey = getPageBlockCacheKey(post.id, post.lastEditedDate)
     const page = await getDataFromCache(cacheKey, true)
-    const tagContent =
-      post?.tags && Array.isArray(post?.tags) ? post?.tags.join(' ') : ''
     const categoryContent =
       post.category && Array.isArray(post.category)
         ? post.category.join(' ')
         : ''
-    const articleInfo = post.title + post.summary + tagContent + categoryContent
+    const articleInfo = post.title + post.summary + categoryContent
     let hit = articleInfo.indexOf(keyword) > -1
     let indexContent = [post.summary]
     if (page && page.block) {

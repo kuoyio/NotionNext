@@ -11,7 +11,7 @@ import { BlogItem } from './BlogItem'
  */
 export default function BlogListScroll(props) {
   const { posts } = props
-  const { locale, NOTION_CONFIG } = useGlobal()
+  const { NOTION_CONFIG } = useGlobal()
   const [page, updatePage] = useState(1)
   const POSTS_PER_PAGE = siteConfig('POSTS_PER_PAGE', null, NOTION_CONFIG)
   let hasMore = false
@@ -54,16 +54,15 @@ export default function BlogListScroll(props) {
   })
 
   return (
-    <div id='posts-wrapper' className='w-full md:pr-8 mb-12' ref={targetRef}>
+    <div id='posts-wrapper' className='simple-post-list' ref={targetRef}>
       {postsToShow.map(p => (
         <BlogItem key={p.id} post={p} />
       ))}
 
       <div
         onClick={handleGetMore}
-        className='w-full my-4 py-4 text-center cursor-pointer '>
-        {' '}
-        {hasMore ? locale.COMMON.MORE : `${locale.COMMON.NO_MORE} 😰`}{' '}
+        className='simple-post-load-more'>
+        {hasMore ? '加载更多' : '没有更多文章了'}
       </div>
     </div>
   )
