@@ -368,12 +368,51 @@ const getIsoTime = value => {
   return date.toISOString()
 }
 
+const normalizePath = value => {
+  const path = String(value || '').split(/[?#]/)[0]
+  return path.replace(/\/+$/, '') || '/'
+}
+
+const getMenuItems = items => {
+  if (!Array.isArray(items)) return []
+
+  return items.flatMap(item => [
+    item,
+    ...(Array.isArray(item?.subMenus) ? getMenuItems(item.subMenus) : [])
+  ])
+}
+
+const getCurrentMenuTitle = (props, router) => {
+  const currentPath = normalizePath(router?.asPath || router?.pathname)
+  const menuItems = [
+    ...getMenuItems(props?.customMenu),
+    ...getMenuItems(props?.customNav)
+  ]
+
+  const matchingItems = menuItems.filter(item => {
+    if (typeof item?.href !== 'string' || !item.href.startsWith('/')) {
+      return false
+    }
+
+    const menuPath = normalizePath(item.href)
+    return (
+      menuPath === currentPath ||
+      (menuPath !== '/' && currentPath.startsWith(`${menuPath}/`))
+    )
+  })
+
+  return matchingItems
+    .sort((a, b) => normalizePath(b.href).length - normalizePath(a.href).length)
+    .map(item => item?.name || item?.title)
+    .find(Boolean)
+}
+
 /**
  * 获取SEO信息
  * @param {*} props
  * @param {*} router
  */
-const getSEOMeta = (props, router, locale) => {
+export const getSEOMeta = (props, router, locale) => {
   const { post, siteInfo, tag, category, page } = props
   const keyword = router?.query?.s
 
@@ -471,10 +510,13 @@ const getSEOMeta = (props, router, locale) => {
       const category = Array.isArray(post?.category)
         ? post?.category?.[0]
         : post?.category
+      const menuTitle = getCurrentMenuTitle(props, router)
+      const pageTitle = post?.title || menuTitle
       return {
-        title: post
-          ? `${post?.title} | ${siteInfo?.title}`
-          : `${siteInfo?.title} | loading`,
+        // 自定义菜单页（例如友链、观影）没有 post，不能回退到 loading 标题。
+        title: pageTitle
+          ? `${pageTitle} | ${siteInfo?.title}`
+          : siteInfo?.title,
         description: post?.summary,
         type: post?.type,
         slug: post?.slug,

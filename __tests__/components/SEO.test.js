@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react'
-import SEO, { generateStructuredData } from '@/components/SEO'
+import SEO, { generateStructuredData, getSEOMeta } from '@/components/SEO'
 
 jest.mock('@/lib/config', () => ({
   siteConfig: jest.fn()
@@ -106,6 +106,50 @@ describe('SEO structured data', () => {
       name: 'Example Blog',
       url: 'https://example.com'
     })
+  })
+})
+
+describe('SEO page titles', () => {
+  const locale = {
+    NAV: { ARCHIVE: 'Archive', SEARCH: 'Search', PAGE_NOT_FOUND: 'Not Found' },
+    COMMON: { CATEGORY: 'Category', TAGS: 'Tags' }
+  }
+
+  it('uses the current custom menu title for non-post pages', () => {
+    const meta = getSEOMeta(
+      {
+        siteInfo: { title: 'Kuoyio Blog' },
+        customMenu: [
+          { name: 'Movies', href: '/movie', show: true },
+          { name: 'Links', href: '/links', show: true }
+        ]
+      },
+      { route: '/movie', pathname: '/movie', asPath: '/movie', query: {} },
+      locale
+    )
+
+    expect(meta.title).toBe('Movies | Kuoyio Blog')
+    expect(meta.title).not.toContain('loading')
+  })
+
+  it('uses a nested menu title for its current page', () => {
+    const meta = getSEOMeta(
+      {
+        siteInfo: { title: 'Kuoyio Blog' },
+        customMenu: [
+          {
+            name: 'Resources',
+            href: '#',
+            show: true,
+            subMenus: [{ title: 'Links', href: '/links', show: true }]
+          }
+        ]
+      },
+      { route: '/links', pathname: '/links', asPath: '/links', query: {} },
+      locale
+    )
+
+    expect(meta.title).toBe('Links | Kuoyio Blog')
   })
 })
 
