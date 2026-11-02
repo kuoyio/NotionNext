@@ -35,7 +35,6 @@ const ArticleInfo = dynamic(() => import('./components/ArticleInfo'), {
   ssr: false
 })
 const TopBar = dynamic(() => import('./components/TopBar'), { ssr: false })
-const SideBar = dynamic(() => import('./components/SideBar'), { ssr: false })
 const JumpToTopButton = dynamic(() => import('./components/JumpToTopButton'), {
   ssr: false
 })
@@ -63,7 +62,7 @@ export const useSimpleGlobal = () => useContext(ThemeGlobalSimple)
  */
 const LayoutBase = props => {
   const { children, slotTop } = props
-  const { onLoading, fullWidth } = useGlobal()
+  const { onLoading } = useGlobal()
   const searchModal = useRef(null)
 
   return (
@@ -110,14 +109,6 @@ const LayoutBase = props => {
               <AdSlot type='native' />
             </div>
 
-            {fullWidth ? null : (
-              <div
-                id='right-sidebar'
-                className='hidden xl:block flex-none sticky top-8 w-96 border-l dark:border-gray-800 pl-12 border-gray-100'
-              >
-                <SideBar {...props} />
-              </div>
-            )}
           </div>
         </SimplePageLayout>
 
